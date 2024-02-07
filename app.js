@@ -61,8 +61,24 @@ alert.classList.remove(`alert-${action}`);
 }, 1000)
 }
 
+//clear function
+function clearItem(){
+let items = document.querySelector('grocery-item')
+if(items.length){
+    items.forEach(function(item){
+        list.removeChild(item);
+    });
+}
+container.classList.remove('show-container');
+displayAlert('empty list', 'danger');
+setBackToDefault();
+// localStorage.removeItem('list');
+
+}
+
 // ****** EVENT LISTENERS **********
 form.addEventListener('submit', addItem)
+clearBtn.addEventListener('click',clearItem)
 
 // ****** LOCAL STORAGE **********
 function addToLocalStorage(id, value){
@@ -70,7 +86,10 @@ console.log('added to local storage');
 }
 
 function setBackToDefault(){
-    console.log('set back to default');
+grocery.value = "";
+editFlag = false;
+editID = "";
+submitBtn.textContent = 'submit';
 }
 
 // ****** SETUP ITEMS **********
