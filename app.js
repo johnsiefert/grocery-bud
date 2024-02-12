@@ -90,7 +90,11 @@ clearBtn.addEventListener('click', clearItem);
 
 // ****** LOCAL STORAGE **********
 function addToLocalStorage(id, value) {
-  console.log('added to local storage');
+const grocery = {id, value};
+console.log(grocery);
+let items =localStorage.getItem("list")? JSON.parse(localStorage.getItem('list')): [];
+items.push(grocery);
+localStorage.setItem('list',JSON.stringify(items))
 }
 
 function removeFromLocalStorage(id){
@@ -98,7 +102,7 @@ function removeFromLocalStorage(id){
 }
 
 function editLocalStorage(id) {
-    
+
 }
 
 function deleteItem(e){
