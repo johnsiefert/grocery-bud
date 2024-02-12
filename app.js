@@ -12,34 +12,15 @@ let editElement;
 let editFlag = false;
 let editID = '';
 
+
+window.addEventListener("DOMContentLoaded", setUpItems)
 // ****** FUNCTIONS **********
 function addItem(e) {
   e.preventDefault();
   let value = grocery.value;
   const id = new Date().getTime().toString();
   if (value && !editFlag) {
-    const element = document.createElement('article');
-    //add class
-    element.classList.add('grocery-item');
-    const attr = document.createAttribute('data-id');
-    attr.value = id;
-    element.setAttributeNode(attr);
-    element.innerHTML = `<p class="title">${value}</p>
-          <div class="btn-container">
-            <button type="button" class="edit-btn">
-              <i class="fas fa-edit"></i>
-            </button>
-                  <button type="button" class="delete-btn">
-              <i class="fas fa-trash"></i>
-            </button>
-          </div>`;
-    //to have access to the edit and delete button. We must create the selector after the element.html is created. not before.
-    const deleteBtn = element.querySelector('.delete-btn');
-    const editBtn = element.querySelector('.edit-btn');
-deleteBtn.addEventListener('click', deleteItem);
-editBtn.addEventListener('click', editItem);
-    //appendChild
-    list.appendChild(element);
+setUpItems(id,value)
     displayAlert('item added to the list', 'success');
     //show container
     container.classList.add('show-container');
@@ -81,7 +62,7 @@ function clearItem() {
   container.classList.remove('show-container');
   displayAlert('empty list', 'danger');
   setBackToDefault();
-  // localStorage.removeItem('list');
+  localStorage.removeItem('list');
 }
 
 // ****** EVENT LISTENERS **********
@@ -92,17 +73,39 @@ clearBtn.addEventListener('click', clearItem);
 function addToLocalStorage(id, value) {
 const grocery = {id, value};
 console.log(grocery);
-let items =localStorage.getItem("list")? JSON.parse(localStorage.getItem('list')): [];
+let items = getLocalStorage();
 items.push(grocery);
 localStorage.setItem('list',JSON.stringify(items))
 }
 
 function removeFromLocalStorage(id){
+let items = getLocalStorage();
+items.filter(function(item){
+    //filtering out items that do not match the id
+    if(item.id !== id){
+return item;
+    }
+});
+localStorage.setItem('list', JSON.stringify(items));
+}
+
+function editLocalStorage(id, value) {
+ let items = getLocalStorage()
+items = items.map(function(item){
+    if(item.id === item){
+        item.value = value;
+    }
+    return item;
+});
+localStorage.setItem('list', JSON.stringify(items));
 
 }
 
-function editLocalStorage(id) {
+function getLocalStorage(){
 
+    return localStorage.getItem('list')
+      ? JSON.parse(localStorage.getItem('list'))
+      : [];
 }
 
 function deleteItem(e){
@@ -140,3 +143,39 @@ function setBackToDefault() {
 }
 
 // ****** SETUP ITEMS **********
+function setUpItems(){
+    let items =getLocalStorage();
+    if(items.length > 0){
+        items.forEach(function(item){
+            createListItem(item.id, item.value)
+
+        });
+        container.classList.add('show-container')
+    }
+}
+
+function createListItem(id,value){
+        const element = document.createElement('article');
+        //add class
+        element.classList.add('grocery-item');
+        const attr = document.createAttribute('data-id');
+        attr.value = id;
+        element.setAttributeNode(attr);
+        element.innerHTML = `<p class="title">${value}</p>
+          <div class="btn-container">
+            <button type="button" class="edit-btn">
+              <i class="fas fa-edit"></i>
+            </button>
+                  <button type="button" class="delete-btn">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>`;
+        //to have access to the edit and delete button. We must create the selector after the element.html is created. not before.
+        const deleteBtn = element.querySelector('.delete-btn');
+        const editBtn = element.querySelector('.edit-btn');
+        deleteBtn.addEventListener('click', deleteItem);
+        editBtn.addEventListener('click', editItem);
+        //appendChild
+        list.appendChild(element);
+
+}
